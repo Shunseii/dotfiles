@@ -18,6 +18,10 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.lang.tailwind" },
     { import = "lazyvim.plugins.extras.lang.go" },
     { import = "lazyvim.plugins.extras.lang.elixir" },
+    { import = "lazyvim.plugins.extras.coding.copilot" },
+    { import = "lazyvim.plugins.extras.ui.treesitter-context" },
+    { import = "lazyvim.plugins.extras.formatting.prettier" },
+    { import = "lazyvim.plugins.extras.linting.eslint" },
 
     -- import/override with your plugins
     { import = "plugins" },
@@ -31,7 +35,7 @@ require("lazy").setup({
     version = false, -- always use the latest git commit
     -- version = "*", -- try installing the latest stable version for plugins that support semver
   },
-  install = { colorscheme = { "tokyonight", "habamax" } },
+  install = { colorscheme = { "nord", "habamax" } },
   checker = { enabled = true }, -- automatically check for plugin updates
   performance = {
     rtp = {
@@ -49,3 +53,8 @@ require("lazy").setup({
     },
   },
 })
+
+vim.api.nvim_set_hl(0, "TreesitterContext", { bg = "#4C566A" })
+vim.api.nvim_set_hl(0, "TreesitterContextLineNumber", { bg = "#4C566A" })
+vim.api.nvim_set_hl(0, "TreesitterContextBottom", { underline = true, sp = "#4C566A" })
+vim.api.nvim_set_hl(0, "TreesitterContextLineNumberBottom", { underline = true, sp = "#4C566A" })

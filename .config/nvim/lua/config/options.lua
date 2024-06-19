@@ -24,3 +24,15 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 local opt = vim.opt
 
 opt.wrap = true
+
+-- vim.api.nvim_set_hl(0, "TreesitterContextBottom", { underline = true, sp = "Grey" })
+-- vim.api.nvim_set_hl(0, "TreesitterContextLineNumberBottom", { underline = true, sp = "Grey" })
+
+-- Change treesitter context color to gray and add underline
+-- vim.cmd([[
+--   augroup TreesitterContextBottom
+--     autocmd!
+--     autocmd ColorScheme * hi TreesitterContextBottom gui=underline guisp=Grey guifg=Grey
+--     autocmd ColorScheme * hi TreesitterContextLineNumberBottom gui=underline guisp=Grey
+--   augroup END
+-- ]])
