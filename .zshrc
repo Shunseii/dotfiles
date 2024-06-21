@@ -77,6 +77,11 @@ plugins=(
     zsh-autosuggestions
 )
 
+# Start tmux if not already inside a tmux session
+if [ -z "$TMUX" ]; then
+  tmux
+fi
+
 source $ZSH/oh-my-zsh.sh
 
 # User configuration
