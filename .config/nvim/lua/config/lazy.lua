@@ -19,7 +19,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.lang.go" },
     { import = "lazyvim.plugins.extras.lang.elixir" },
     { import = "lazyvim.plugins.extras.lang.python" },
-    { import = "lazyvim.plugins.extras.coding.copilot" },
+    -- { import = "lazyvim.plugins.extras.coding.copilot" },
     { import = "lazyvim.plugins.extras.ui.treesitter-context" },
     { import = "lazyvim.plugins.extras.formatting.prettier" },
     { import = "lazyvim.plugins.extras.linting.eslint" },
@@ -56,6 +56,7 @@ require("lazy").setup({
   },
 })
 
+-- Style treesitter context
 vim.api.nvim_set_hl(0, "TreesitterContext", { bg = "#4C566A" })
 vim.api.nvim_set_hl(0, "TreesitterContextLineNumber", { bg = "#4C566A" })
 vim.api.nvim_set_hl(0, "TreesitterContextBottom", { underline = true, sp = "#4C566A" })
