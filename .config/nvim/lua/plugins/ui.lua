@@ -79,6 +79,17 @@ return {
           silent = true,
         },
       },
+      -- Src: https://github.com/yioneko/vtsls/issues/159#issuecomment-2159349677
+      -- REMOVE THIS once this issue is fixed: https://github.com/yioneko/vtsls/issues/159
+      routes = {
+        {
+          filter = {
+            event = "notify",
+            find = "Request textDocument/inlayHint failed",
+          },
+          opts = { skip = true },
+        },
+      },
       presets = {
         lsp_doc_border = true,
       },
