@@ -163,4 +163,7 @@ export PATH="/home/shunsei/.turso:$PATH"
 # Pulumi
 export PULUMI_CONFIG_PASSPHRASE=""
 
+# Granted CLI
+alias assume="source assume"
+
 alias config='/usr/bin/git --git-dir=/home/shunsei/.cfg/ --work-tree=/home/shunsei'
