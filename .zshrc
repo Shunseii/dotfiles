@@ -167,3 +167,7 @@ export PULUMI_CONFIG_PASSPHRASE=""
 alias assume="source assume"
 
 alias config='/usr/bin/git --git-dir=/home/shunsei/.cfg/ --work-tree=/home/shunsei'
+
+# OpenVPN FFAI
+alias vpn='openvpn3 session-start --config ~/Desktop/sufyan-new.ovpn'
+alias cvpn='openvpn3 session-manage --disconnect --config ~/Desktop/sufyan-new.ovpn'
