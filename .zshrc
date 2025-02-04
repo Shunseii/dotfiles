@@ -157,6 +157,10 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # Turso
 export PATH="/home/shunsei/.turso:$PATH"
 
+# flyctl
+export FLYCTL_INSTALL="$HOME/.fly"
+export PATH="$FLYCTL_INSTALL/bin:$PATH"
+
 # AWS
 # export AWS_PROFILE=litespace_dev
 
