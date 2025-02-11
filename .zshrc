@@ -167,6 +167,12 @@ export PATH="$FLYCTL_INSTALL/bin:$PATH"
 # Pulumi
 export PULUMI_CONFIG_PASSPHRASE=""
 
+# Flutter
+export PATH="$HOME/development/flutter/bin:$PATH"
+
+# Android Studio
+export PATH="$HOME/Android/Sdk/platform-tools:$PATH"
+
 # Granted CLI
 alias assume="source assume"
 
