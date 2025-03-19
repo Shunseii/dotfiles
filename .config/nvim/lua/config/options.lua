@@ -27,6 +27,13 @@ opt.wrap = true
 
 vim.g.snacks_animate = false
 
+-- Set arb files as json for Flutter projects
+vim.filetype.add({
+  extension = {
+    arb = "json",
+  },
+})
+
 -- vim.cmd([[autocmd! ColorScheme * highlight NormalFloat guibg=#1f2335]])
 -- vim.cmd([[autocmd! ColorScheme * highlight FloatBorder guifg=white guibg=#1f2335]])
 
@@ -49,3 +56,11 @@ function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
   opts.border = opts.border or border
   return orig_util_open_floating_preview(contents, syntax, opts, ...)
 end
+
+-- Don't hide codeblock syntax in markdown
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    vim.opt_local.conceallevel = 0
+  end,
+})
