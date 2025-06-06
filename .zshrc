@@ -80,6 +80,7 @@ plugins=(
 # Start tmux if not already inside a tmux session
 if [ -z "$TMUX" ]; then
   tmux
+  exit  # Exit shell when tmux exits
 fi
 
 source $ZSH/oh-my-zsh.sh
@@ -212,6 +213,11 @@ load-nvmrc() {
 
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
+
+OP_PERSONAL_ACCOUNT="my.1password.com"
+
+# Needed for avante.nvim to perform web search
+export BRAVE_API_KEY="$(op read 'op://Private/Brave Search API Key/api key' --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null || echo '')"
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
