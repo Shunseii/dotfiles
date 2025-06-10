@@ -4,20 +4,30 @@ return {
   lazy = false,
   version = false, -- set this if you want to always pull the latest change
   opts = {
-    provider = "copilot",
-    auto_suggestions_provider = "copilot",
+    provider = "claude",
+    auto_suggestions_provider = "claude",
     providers = {
-      copilot = {
-        endpoint = "https://api.githubcopilot.com",
-        model = "gpt-4o-2024-05-13",
-        proxy = nil, -- [protocol://]host[:port] Use this proxy
-        allow_insecure = false, -- Allow insecure server connections
-        timeout = 30000, -- Timeout in milliseconds
+      claude = {
+        endpoint = "https://api.anthropic.com",
+        model = "claude-3-5-sonnet-20241022",
+        timeout = 30000,
         extra_request_body = {
           temperature = 0,
           max_tokens = 4096,
         },
       },
+      -- Copilot configuration (commented out for easy switching)
+      -- copilot = {
+      --   endpoint = "https://api.githubcopilot.com",
+      --   model = "gpt-4o-2024-05-13",
+      --   proxy = nil, -- [protocol://]host[:port] Use this proxy
+      --   allow_insecure = false, -- Allow insecure server connections
+      --   timeout = 30000, -- Timeout in milliseconds
+      --   extra_request_body = {
+      --     temperature = 0,
+      --     max_tokens = 4096,
+      --   },
+      -- },
     },
     behaviour = {
       auto_suggestions = false, -- Experimental stage
@@ -123,4 +133,3 @@ return {
     },
   },
 }
-
