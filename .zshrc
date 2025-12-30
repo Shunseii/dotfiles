@@ -75,6 +75,7 @@ plugins=(
     last-working-dir 
     zsh-interactive-cd
     zsh-autosuggestions
+    direnv
 )
 
 # Start tmux if not already inside a tmux session
@@ -181,7 +182,7 @@ compdef config=git
 
 # OpenVPN FFAI
 alias vpn='openvpn3 session-start --config ~/Desktop/sufyan-new.ovpn'
-alias cvpn='openvpn3 session-manage --disconnect --config ~/Desktop/sufyan-new.ovpn'
+alias cvpn='openvpn3 sessions-list | grep "Path:" | awk "{print \$2}" | xargs -I {} openvpn3 session-manage --disconnect --path {}'
 
 # Dagger CLI (CI) completion
 autoload -U compinit
@@ -217,11 +218,40 @@ load-nvmrc() {
 add-zsh-hook chpwd load-nvmrc
 load-nvmrc
 
-OP_PERSONAL_ACCOUNT="my.1password.com"
+export PULUMI_CONFIG_PASSPHRASE=""
 
-# Needed for avante.nvim to perform web search
-export BRAVE_API_KEY="$(op read 'op://Private/Brave Search API Key/api key' --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null || echo '')"
-export ANTHROPIC_API_KEY="$(op read 'op://Private/Anthropic/api-key' --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null || echo '')"
+## Prompts signing into 1password every time 
+## a new terminal is opened which is annoying.
+# OP_PERSONAL_ACCOUNT="my.1password.com"
+#
+# # Needed for avante.nvim to perform web search
+# export BRAVE_API_KEY="$(op read 'op://Private/Brave Search API Key/api key' --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null || echo '')"
+# export ANTHROPIC_API_KEY="$(op read 'op://Private/Anthropic/api-key' --account "$OP_PERSONAL_ACCOUNT" 2>/dev/null || echo '')"
+
+uuid_to_mongo_bin() {
+  local base64uuid
+  base64uuid=$(node -e "console.log(Buffer.from(process.argv[1].replace(/-/g, ''), 'hex').toString('base64'))" "$1")
+  echo "{ _id: BinData(3, \"$base64uuid\") }"
+}
+
+base64_to_uuid() {
+  local base64uuid="$1"
+  local hex uuid
+
+  # Decode the base64 string to hex using Node.js
+  hex=$(node -e "console.log(Buffer.from(process.argv[1], 'base64').toString('hex'))" "$base64uuid")
+
+  # Insert hyphens to format as UUID (8-4-4-4-12)
+  uuid="${hex:0:8}-${hex:8:4}-${hex:12:4}-${hex:16:4}-${hex:20:12}"
+
+  echo "$uuid"
+}
 
 # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
 export PATH="$PATH:$HOME/.rvm/bin"
+
+# opencode
+export PATH=/home/shunsei/.opencode/bin:$PATH
+
+# Ensure SHELL is set to zsh
+export SHELL=/usr/bin/zsh

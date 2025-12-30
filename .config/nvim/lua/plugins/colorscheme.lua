@@ -48,6 +48,7 @@ return {
     lazy = false,
     priority = 1000,
     opts = {
+      transparent = true,
       on_highlights = function(highlights, colors)
         -- Make Avante separators consistent with nvim-tree separators
         local separator_color = "#3b4252" -- Same as nvim-tree separators
