@@ -7,3 +7,7 @@ local opt = vim.opt
 opt.wrap = true
 
 vim.g.snacks_animate = true
+
+vim.diagnostic.config({
+  float = { border = "rounded" },
+})
