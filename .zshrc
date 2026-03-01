@@ -79,7 +79,7 @@ plugins=(
 )
 
 # Start tmux if not already inside a tmux session
-if [ -z "$TMUX" ]; then
+if [[ -t 0 ]] && [ -z "$TMUX" ]; then
   tmux
   exit  # Exit shell when tmux exits
 fi
@@ -115,13 +115,17 @@ source $ZSH/oh-my-zsh.sh
 alias mongo="mongo --port 27018"
 alias vim="nvim"
 
-echo "As-salamualaikum!" | figlet -w 150 -f slant | lolcat
-echo "Today is:             $(date +%A', '%B' '%e', '%Y' ('%Z')')"
-echo "Your Private IP is:   $(hostname -I | awk '{print $1}')"
+if [[ -t 0 ]]; then
+  echo "As-salamualaikum!" | figlet -w 150 -f slant | lolcat
+  echo "Today is:             $(date +%A', '%B' '%e', '%Y' ('%Z')')"
+  echo "Your Private IP is:   $(hostname -I | awk '{print $1}')"
+fi
 
 export NODE_ENV=development
 export DENO_INSTALL="/home/shunsei/.deno"
 export PATH="$DENO_INSTALL/bin:$PATH"
+
+export PGUSER=postgres
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 

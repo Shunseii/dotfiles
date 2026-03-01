@@ -29,6 +29,7 @@ require("lazy").setup({
     { import = "lazyvim.plugins.extras.formatting.biome" },
     { import = "lazyvim.plugins.extras.linting.eslint" },
     { import = "lazyvim.plugins.extras.editor.aerial" },
+    { import = "lazyvim.plugins.extras.lang.markdown" },
 
     -- import/override with your plugins
     { import = "plugins" },
@@ -60,9 +61,3 @@ require("lazy").setup({
     },
   },
 })
-
--- Style treesitter context
-vim.api.nvim_set_hl(0, "TreesitterContext", { bg = "#4C566A" })
-vim.api.nvim_set_hl(0, "TreesitterContextLineNumber", { bg = "#4C566A" })
-vim.api.nvim_set_hl(0, "TreesitterContextBottom", { underline = true, sp = "#4C566A" })
-vim.api.nvim_set_hl(0, "TreesitterContextLineNumberBottom", { underline = true, sp = "#4C566A" })

@@ -1,46 +1,4 @@
--- return {
---   {
---     "folke/tokyonight.nvim",
---     lazy = true,
---     opts = {
---       style = "storm",
---       transparent = true,
---       styles = {
---         sidebars = "dark",
---         floats = "dark",
---       },
---       on_highlights = function(highlights, colors)
---         -- Make Avante separators more visible
---         highlights.AvanteSeparator = { fg = colors.fg_gutter }
---         highlights.AvanteVerticalSeparator = { fg = colors.fg_gutter }
---         highlights.AvanteHorizontalSeparator = { fg = colors.fg_gutter }
---         highlights.AvanteWinSeparator = { fg = colors.fg_gutter }
---         highlights.AvanteSidebarWinSeparator = { fg = colors.fg_gutter }
---       end,
---     },
---   },
---   {
---     "LazyVim/LazyVim",
---     opts = {
---       colorscheme = "tokyonight",
---     },
---   },
--- }
-
--- return {
---   {
---     dir = vim.fn.stdpath("config") .. "/lua/themes/nord-custom",
---     name = "nord-custom",
---     lazy = false,
---     priority = 1000,
---   },
---   {
---     "LazyVim/LazyVim",
---     opts = {
---       colorscheme = "nord-custom",
---     },
---   },
--- }
+vim.opt.fillchars:append({ diff = " " })
 
 return {
   {
@@ -50,14 +8,16 @@ return {
     opts = {
       transparent = true,
       on_highlights = function(highlights, colors)
-        -- Make Avante separators consistent with nvim-tree separators
-        local separator_color = "#3b4252" -- Same as nvim-tree separators
-        highlights.AvanteBorder = { fg = separator_color }
-        highlights.AvanteSeparator = { fg = separator_color }
-        highlights.AvanteVerticalSeparator = { fg = separator_color }
-        highlights.AvanteHorizontalSeparator = { fg = separator_color }
-        highlights.AvanteWinSeparator = { fg = separator_color }
-        highlights.AvanteSidebarWinSeparator = { fg = separator_color }
+        highlights.DiffAdd = { bg = "#2e4033" }
+        highlights.DiffChange = { bg = "#2e3b4e" }
+        highlights.DiffDelete = { bg = "#4c2c2c" }
+        highlights.DiffText = { bg = "#3b4e6e" }
+
+        local context_bg = "#4C566A"
+        highlights.TreesitterContext = { bg = context_bg }
+        highlights.TreesitterContextLineNumber = { bg = context_bg }
+        highlights.TreesitterContextBottom = { underline = true, sp = context_bg }
+        highlights.TreesitterContextLineNumberBottom = { underline = true, sp = context_bg }
       end,
     },
   },
