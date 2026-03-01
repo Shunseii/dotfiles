@@ -6,4 +6,4 @@ local opt = vim.opt
 
 opt.wrap = true
 
-vim.g.snacks_animate = false
+vim.g.snacks_animate = true

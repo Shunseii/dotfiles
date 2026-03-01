@@ -9,7 +9,7 @@ return {
       transparent = true,
       on_highlights = function(highlights, colors)
         highlights.DiffAdd = { bg = "#2e4033" }
-        highlights.DiffChange = { bg = "#2e3b4e" }
+        highlights.DiffChange = { bg = "#3b3a2e" }
         highlights.DiffDelete = { bg = "#4c2c2c" }
         highlights.DiffText = { bg = "#3b4e6e" }
 
