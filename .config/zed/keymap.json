@@ -1,0 +1,70 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "Workspace",
+    "bindings": {
+      // "shift shift": "file_finder::Toggle"
+    },
+  },
+  // {
+  //   "context": "Editor && vim_mode == insert",
+  //   "bindings": {
+  //     // "j k": "vim::NormalBefore"
+  //   },
+  // },
+  {
+    "context": "GitPanel && !CommitEditor",
+    "bindings": {
+      "l": "git::ToggleStaged",
+    },
+  },
+  {
+    "context": "(Dock || (Editor && vim_mode != insert)) && !MessageEditor && !CommitEditor && !Terminal && !CommandPalette",
+    "bindings": {
+      "space e": "workspace::ToggleLeftDock",
+      "space E": "project_panel::ToggleFocus",
+    },
+  },
+  {
+    "context": "Dock || Terminal || Editor || KeyContextView",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-j": "workspace::ActivatePaneDown",
+    },
+  },
+  {
+    "context": "Editor && VimControl && !VimWaiting && !menu",
+    "bindings": {
+      "space t": "workspace::NewTerminal",
+      "space T": "workspace::NewCenterTerminal",
+      "space b b": "pane::ActivateLastItem",
+      "shift-l": "pane::ActivateNextItem",
+      "shift-h": "pane::ActivatePreviousItem",
+      "space g g": "git_panel::ToggleFocus",
+      "space g G": "git::Branch",
+      "space c a": "editor::ToggleCodeActions",
+      "space b d": "pane::CloseActiveItem",
+      "] h": "editor::GoToHunk",
+      "[ h": "editor::GoToPreviousHunk",
+      "space b o": "pane::CloseOtherItems",
+      "g r": "editor::FindAllReferences",
+      "ctrl-y": "agent::AllowOnce",
+      "ctrl-Y": "agent::AllowAlways",
+    },
+  },
+  {
+    "context": "Editor && vim_mode == visual && !VimWaiting && !VimObject",
+    "bindings": {
+      "shift-j": "editor::MoveLineDown",
+      "shift-k": "editor::MoveLineUp",
+    },
+  },
+]
