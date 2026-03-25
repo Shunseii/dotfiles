@@ -259,3 +259,16 @@ export PATH=/home/shunsei/.opencode/bin:$PATH
 
 # Ensure SHELL is set to zsh
 export SHELL=/usr/bin/zsh
+export SSH_AUTH_SOCK=~/.1password/agent.sock
+
+alias ffai='cd ~/Projects/ffai'
+alias web-client='cd ~/Projects/ffai/web-client'
+alias pathways='cd ~/Projects/ffai/ffai-pathways'
+
+alias bahar='cd ~/Projects/bahar'
+alias b='bahar'
+
+alias vault='cd ~/Documents/Obsidian\ Vault'
+alias v='vault'
+alias ob='vault'
+alias ov='vault'
