@@ -180,6 +180,7 @@ export PATH="$HOME/Android/Sdk/platform-tools:$PATH"
 alias assume="source assume"
 
 alias config='/usr/bin/git --git-dir=/home/shunsei/.cfg/ --work-tree=/home/shunsei'
+alias claude-config='/usr/bin/git --git-dir=/home/shunsei/.claude-config.git/ --work-tree=/home/shunsei'
 
 ## Use the same autocomplete for `config` cmd above as for git
 compdef config=git
@@ -256,6 +257,9 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 # opencode
 export PATH=/home/shunsei/.opencode/bin:$PATH
+
+# vanta
+export PATH=/var/vanta:$PATH
 
 # Ensure SHELL is set to zsh
 export SHELL=/usr/bin/zsh
