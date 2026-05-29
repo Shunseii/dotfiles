@@ -276,3 +276,11 @@ alias vault='cd ~/Documents/Obsidian\ Vault'
 alias v='vault'
 alias ob='vault'
 alias ov='vault'
+
+cdwt() {
+  local root
+  root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "cdwt: not in a git repo" >&2; return 1; }
+  local wt_dir="$root/.claude/worktrees"
+  [[ -d "$wt_dir" ]] || { echo "cdwt: $wt_dir does not exist" >&2; return 1; }
+  cd "$wt_dir${1:+/$1}"
+}
