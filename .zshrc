@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/shunsei/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -179,8 +179,8 @@ export PATH="$HOME/Android/Sdk/platform-tools:$PATH"
 # Granted CLI
 alias assume="source assume"
 
-alias config='/usr/bin/git --git-dir=/home/shunsei/.cfg/ --work-tree=/home/shunsei'
-alias claude-config='/usr/bin/git --git-dir=/home/shunsei/.claude-config.git/ --work-tree=/home/shunsei'
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+alias claude-config='/usr/bin/git --git-dir=$HOME/.claude-config.git/ --work-tree=$HOME'
 
 ## Use the same autocomplete for `config` cmd above as for git
 compdef config=git
