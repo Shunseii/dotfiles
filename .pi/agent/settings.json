@@ -1,0 +1,13 @@
+{
+  "skills": [
+    "~/.claude/skills"
+  ],
+  "enableSkillCommands": true,
+  "lastChangelogVersion": "0.80.2",
+  "theme": "dark",
+  "defaultProvider": "opencode-go",
+  "defaultModel": "big-pickle",
+  "packages": [
+    "npm:context-mode"
+  ]
+}
