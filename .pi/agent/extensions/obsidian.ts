@@ -37,25 +37,9 @@ export default function (pi: ExtensionAPI) {
   pi.registerTool({
     name: "obsidian",
     label: "Obsidian",
-    description: [
-      "Interact with the Obsidian vault via the `obsidian` CLI.",
-      "Pass the subcommand in `command` and its parameters in `args` as `key=value` strings (or bare flags).",
-      "Conventions: `file=<name>` resolves by name like a wikilink; `path=<folder/note.md>` is exact.",
-      "Quote values with spaces, e.g. `name=My Note`. Use \\n for newline in `content`.",
-      "",
-      "Common commands:",
-      "  read file=Note            — read a note's contents",
-      "  search query=term         — full-text search the vault",
-      "  search:context query=term — search with matching line context",
-      "  create path=folder/x.md content=...  — create a note",
-      "  append file=Note content=...         — append to a note",
-      "  prepend file=Note content=...        — prepend to a note",
-      "  files / folders / tags / properties  — list vault structure",
-      "  links file=Note / backlinks file=Note — link graph",
-      "  daily:read / daily:append content=... — daily note",
-      "  tasks / task                          — tasks",
-      "Run `command=help` to list every subcommand.",
-    ].join("\n"),
+    description:
+      "Run the Obsidian CLI. `command` is the subcommand, `args` are `key=value` strings. " +
+      "For subcommand syntax see the `obsidian` skill or run `command=help`.",
     parameters: Type.Object({
       command: Type.String({
         description: "The obsidian subcommand, e.g. 'read', 'search', 'create'.",
