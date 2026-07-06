@@ -9,5 +9,6 @@
   "defaultModel": "big-pickle",
   "packages": [
     "npm:context-mode"
-  ]
+  ],
+  "hideThinkingBlock": true
 }
