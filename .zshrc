@@ -1,3 +1,5 @@
+# Add deno completions to search path
+if [[ ":$FPATH:" != *":/home/shunsei-pop/.zsh/completions:"* ]]; then export FPATH="/home/shunsei-pop/.zsh/completions:$FPATH"; fi
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
@@ -122,7 +124,7 @@ if [[ -t 0 ]]; then
 fi
 
 export NODE_ENV=development
-export DENO_INSTALL="/home/shunsei/.deno"
+export DENO_INSTALL="$HOME/.deno"
 export PATH="$DENO_INSTALL/bin:$PATH"
 
 export PGUSER=postgres
@@ -136,7 +138,7 @@ export NVM_DIR="$HOME/.nvm"
 export GIT_EDITOR=nvim
 
 # pnpm
-export PNPM_HOME="/home/shunsei/.local/share/pnpm"
+export PNPM_HOME="$HOME/.local/share/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 # pnpm end
 
@@ -154,14 +156,14 @@ export ERL_AFLAGS="-kernel shell_history enabled"
 export PATH=$PATH:$HOME/.pulumi/bin
 
 # bun completions
-[ -s "/home/shunsei/.bun/_bun" ] && source "/home/shunsei/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Turso
-export PATH="/home/shunsei/.turso:$PATH"
+export PATH="$HOME/.turso:$PATH"
 
 # flyctl
 export FLYCTL_INSTALL="$HOME/.fly"
@@ -256,7 +258,7 @@ base64_to_uuid() {
 export PATH="$PATH:$HOME/.rvm/bin"
 
 # opencode
-export PATH=/home/shunsei/.opencode/bin:$PATH
+export PATH=$HOME/.opencode/bin:$PATH
 
 # vanta
 export PATH=/var/vanta:$PATH
@@ -269,13 +271,17 @@ alias ffai='cd ~/Projects/ffai'
 alias web-client='cd ~/Projects/ffai/web-client'
 alias pathways='cd ~/Projects/ffai/ffai-pathways'
 
-alias bahar='cd ~/Projects/bahar'
-alias b='bahar'
+alias projects='cd ~/Projects'
+alias prj='projects'
+alias prjs='projects'
+alias p='projects'
 
 alias vault='cd ~/Documents/Obsidian\ Vault'
 alias v='vault'
 alias ob='vault'
 alias ov='vault'
+
+alias tcsm='$HOME/.claude/scripts/tmux-claude-session-manager'
 
 cdwt() {
   local root
@@ -284,3 +290,50 @@ cdwt() {
   [[ -d "$wt_dir" ]] || { echo "cdwt: $wt_dir does not exist" >&2; return 1; }
   cd "$wt_dir${1:+/$1}"
 }
+
+# View a PR branch as unstaged local changes (for a local diff viewer).
+# Leaves HEAD detached at the base, all PR changes unstaged in the worktree.
+# Usage: pr-unstage <pr-branch> [base]   (base defaults to origin's default branch)
+pr-unstage() {
+  local branch="$1" base="$2"
+  [[ -n "$branch" ]] || { echo "usage: pr-unstage <pr-branch> [base]" >&2; return 1; }
+  git rev-parse --is-inside-work-tree >/dev/null 2>&1 || { echo "pr-unstage: not in a git repo" >&2; return 1; }
+  if ! git diff --quiet || ! git diff --cached --quiet; then
+    echo "pr-unstage: working tree not clean — commit or stash first" >&2; return 1
+  fi
+  git fetch origin || return 1
+  if [[ -z "$base" ]]; then
+    base=$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null)
+    base=${base:-origin/main}
+  fi
+  git rev-parse --verify --quiet "$base" >/dev/null || base="origin/$base"
+  git rev-parse --verify --quiet "$base" >/dev/null || { echo "pr-unstage: base not found" >&2; return 1; }
+  git switch --detach "$branch" 2>/dev/null \
+    || git switch --detach "origin/$branch" 2>/dev/null \
+    || { echo "pr-unstage: branch '$branch' not found" >&2; return 1; }
+  git reset --soft "$base" || return 1   # HEAD -> base; index + worktree keep PR tree (staged)
+  git reset || return 1                  # unstage -> PR diff as unstaged changes
+  git add -N . 2>/dev/null               # surface new files in `git diff`
+  echo "pr-unstage: $branch vs $base — changes unstaged, HEAD detached at base. Run 'git switch -' to leave."
+}
+
+# Run the video-transcriber (whisper-rs) on a YouTube URL or local file, from any dir.
+# Output (.txt + .srt) lands in ./out of the current directory. Defaults: large-v3, Arabic.
+# Requires the release binary to be built first: see ~/Projects/video-transcriber/CLAUDE.md
+transcribe() {
+  /home/shunsei-pop/Projects/video-transcriber/target/release/video-transcriber "$@"
+}
+
+# pyenv (Python version management — e.g. ffai-pathways needs 3.10 via .python-version)
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init - zsh)"
+
+# asdf (erlang/elixir version manager)
+export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
+# Pi
+export PATH="/home/shunsei-pop/.local/share/pi-node/node-v22.22.3-linux-x64/bin:$PATH"
+
+export EDITOR=nvim
+. "/home/shunsei-pop/.deno/env"
