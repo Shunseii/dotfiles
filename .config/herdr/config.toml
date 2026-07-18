@@ -39,6 +39,9 @@ next_tab = ["prefix+n", "alt+shift+l"]
 next_workspace = "prefix+j"
 previous_workspace = "prefix+k"
 
+# Jump to workspace N: ctrl+space then shift+1..9.
+switch_workspace = "prefix+shift+1..9"
+
 # Jump to agent N in the sidebar: ctrl+space then alt+1..9.
 focus_agent = "prefix+alt+1..9"
 
