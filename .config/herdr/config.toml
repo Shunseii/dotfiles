@@ -20,6 +20,7 @@ overlay1 = "#e5e9f0"    # nord5
 [ui]
 pane_borders = true
 
+agent_panel_sort = "spaces"
 [terminal]
 # Always open new panes/tabs in ~/Projects. Avoids "follow" inheriting the
 # context-mode plugin cache dir from the foreground process of a claude pane.
@@ -32,6 +33,24 @@ prefix = "ctrl+space"
 # tmux had `M-H`/`M-L` (alt+shift) for prev/next window. Keep prefix binds too.
 previous_tab = ["prefix+p", "alt+shift+h"]
 next_tab = ["prefix+n", "alt+shift+l"]
+
+# Vim-style workspace nav. Overrides the default prefix+j/k pane-focus, which
+# is redundant here — panes are navigated with ctrl+h/j/k/l (vim plugin).
+next_workspace = "prefix+j"
+previous_workspace = "prefix+k"
+
+# Jump to agent N in the sidebar: ctrl+space then alt+1..9.
+focus_agent = "prefix+alt+1..9"
+
+# Navigate mode: use hjkl instead of arrows. j/k move between workspaces
+# (the vertical sidebar list), h/l between panes left/right. Pane up/down
+# moves to the arrows that workspaces vacated, so nothing double-binds.
+navigate_workspace_down = "j"
+navigate_workspace_up = "k"
+navigate_pane_left = "h"
+navigate_pane_right = "l"
+navigate_pane_down = "down"
+navigate_pane_up = "up"
 
 # tmux split keys: `"` splits down (horizontal), `%` splits right (vertical).
 # Herdr default minus/v kept as safe fallback in case the punctuation names
