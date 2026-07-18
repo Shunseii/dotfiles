@@ -80,10 +80,12 @@ plugins=(
     direnv
 )
 
-# Start tmux if not already inside a tmux session
-if [[ -t 0 ]] && [ -z "$TMUX" ]; then
-  tmux
-  exit  # Exit shell when tmux exits
+# Start herdr for interactive shells, but not when already inside a
+# multiplexer (tmux) or inside a herdr pane (HERDR_ENV=1). The HERDR_ENV
+# guard is required so panes herdr spawns don't recursively launch herdr.
+if [[ -t 0 ]] && [ -z "$TMUX" ] && [ -z "$HERDR_ENV" ]; then
+  herdr
+  exit  # Exit shell when herdr exits
 fi
 
 source $ZSH/oh-my-zsh.sh

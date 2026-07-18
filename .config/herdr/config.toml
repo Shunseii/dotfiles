@@ -1,0 +1,72 @@
+onboarding = false
+# Herdr config — reference: https://herdr.dev/docs/config-reference/
+# Reload after edits: `herdr server reload-config` or prefix+shift+r.
+
+[theme]
+name = "nord"
+
+# overlay drives BOTH the headers/separators AND the non-focus pane border.
+# Keep it a mid tone: brighter than stock nord (so separators/headers read),
+# but dimmer than the focused border's frost, so focus still stands out with
+# its original nord color (accent left at nord default — the look you liked).
+[theme.custom]
+surface_dim = "#4c566a" # nord3 — navigator separator + sidebar list bg
+# overlay0/1 = muted secondary role: headers, non-focus pane borders, agent
+# provider label, non-focus tab text. Lift to nord4/5 for readable text; the
+# non-focus border stays distinct from the focused frost border by hue.
+overlay0 = "#d8dee9"    # nord4
+overlay1 = "#e5e9f0"    # nord5
+
+[ui]
+pane_borders = true
+
+[terminal]
+# Always open new panes/tabs in ~/Projects. Avoids "follow" inheriting the
+# context-mode plugin cache dir from the foreground process of a claude pane.
+new_cwd = "~/Projects"
+
+[keys]
+# tmux muscle memory: prefix was C-space, not the herdr default ctrl+b.
+prefix = "ctrl+space"
+
+# tmux had `M-H`/`M-L` (alt+shift) for prev/next window. Keep prefix binds too.
+previous_tab = ["prefix+p", "alt+shift+h"]
+next_tab = ["prefix+n", "alt+shift+l"]
+
+# tmux split keys: `"` splits down (horizontal), `%` splits right (vertical).
+# Herdr default minus/v kept as safe fallback in case the punctuation names
+# don't parse on this terminal.
+split_horizontal = ["prefix+minus", "prefix+quote"]
+split_vertical = ["prefix+v", "prefix+percent"]
+
+# vim-herdr-navigation: seamless ctrl+h/j/k/l across Vim splits and herdr panes.
+# Requires the plugin linked: `herdr plugin link ~/.config/herdr/plugins/vim-herdr-navigation`
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "vim-herdr-navigation.left"
+description = "navigate left (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "vim-herdr-navigation.down"
+description = "navigate down (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "vim-herdr-navigation.up"
+description = "navigate up (vim/herdr)"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "vim-herdr-navigation.right"
+description = "navigate right (vim/herdr)"
+
+[ui.sound]
+enabled = false
+
+[ui.toast]
+delivery = "off"
