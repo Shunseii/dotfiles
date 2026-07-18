@@ -20,3 +20,8 @@ vim.keymap.set("x", "<leader>p", [["_dP]])
 -- Keep cursor in the same place when scrolling through page
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
+
+-- Seamless <C-h/j/k/l> across Neovim splits and herdr panes. Loaded here (on
+-- VeryLazy, after LazyVim's default <C-w> window maps) so these win instead of
+-- being clobbered by the defaults.
+dofile(vim.fn.expand("~/.config/herdr/plugins/vim-herdr-navigation/editor/nvim.lua"))

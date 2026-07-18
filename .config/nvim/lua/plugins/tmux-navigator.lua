@@ -8,8 +8,7 @@ return {
     init = function()
       vim.g.tmux_navigator_no_mappings = 1
     end,
-    config = function()
-      dofile(vim.fn.expand("~/.config/herdr/plugins/vim-herdr-navigation/editor/nvim.lua"))
-    end,
+    -- The <C-h/j/k/l> maps are loaded from lua/config/keymaps.lua (on VeryLazy,
+    -- after LazyVim's default <C-w> window maps) so they aren't clobbered.
   },
 }
