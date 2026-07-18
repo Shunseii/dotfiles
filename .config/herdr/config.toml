@@ -87,6 +87,15 @@ type = "plugin_action"
 command = "vim-herdr-navigation.right"
 description = "navigate right (vim/herdr)"
 
+# Sync the focused pane's Claude Code session name to its tab label. Reads the
+# live name (honors `claude -n` and `/rename`) from ~/.claude/sessions/<pid>.json.
+# No-op if the focused pane isn't a named Claude session.
+[[keys.command]]
+key = "prefix+t"
+type = "shell"
+command = "/home/shunsei-pop/.config/herdr/sync-tab-title.sh"
+description = "sync Claude session name to tab"
+
 [ui.sound]
 enabled = false
 
