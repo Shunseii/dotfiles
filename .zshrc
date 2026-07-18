@@ -283,7 +283,6 @@ alias v='vault'
 alias ob='vault'
 alias ov='vault'
 
-alias tcsm='$HOME/.claude/scripts/tmux-claude-session-manager'
 
 cdwt() {
   local root
