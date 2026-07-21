@@ -36,8 +36,16 @@ next_tab = ["prefix+n", "alt+shift+l"]
 
 # Vim-style workspace nav. Overrides the default prefix+j/k pane-focus, which
 # is redundant here — panes are navigated with ctrl+h/j/k/l (vim plugin).
-next_workspace = "prefix+j"
-previous_workspace = "prefix+k"
+# Direct alt+j/k chords added so cycling doesn't need prefix re-pressed each
+# step; prefix+j/k kept for muscle memory. (prefix+w opens navigate mode too.)
+next_workspace = ["prefix+j", "alt+j"]
+previous_workspace = ["prefix+k", "alt+k"]
+
+# Cycle agents in the sidebar prefix-free. Agents aren't part of navigate mode,
+# so direct chords are the only prefix-free option. alt+shift+j/k mirrors the
+# alt+shift+h/l tab chords above (vertical=agents, horizontal=tabs).
+next_agent = "alt+shift+j"
+previous_agent = "alt+shift+k"
 
 # Jump to workspace N: ctrl+space then shift+1..9.
 switch_workspace = "prefix+shift+1..9"
