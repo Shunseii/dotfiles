@@ -283,6 +283,7 @@ alias v='vault'
 alias ob='vault'
 alias ov='vault'
 
+alias learning='cd ~/Documents/learning'
 
 cdwt() {
   local root
