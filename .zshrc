@@ -285,6 +285,10 @@ alias ov='vault'
 
 alias learning='cd ~/Documents/learning'
 
+# mlterm does line-level bidi; kitty only reorders within a word.
+# Use this for editing Arabic/RTL Typst documents.
+alias typst-edit='mlterm -e nvim'
+
 cdwt() {
   local root
   root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "cdwt: not in a git repo" >&2; return 1; }
@@ -339,3 +343,4 @@ export PATH="/home/shunsei-pop/.local/share/pi-node/node-v22.22.3-linux-x64/bin:
 
 export EDITOR=nvim
 . "/home/shunsei-pop/.deno/env"
+
