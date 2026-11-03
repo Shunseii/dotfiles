@@ -105,6 +105,18 @@ type = "plugin_action"
 command = "shunsei.goto.open"
 description = "goto picker (recent first)"
 
+[[keys.command]]
+key = "prefix+t"
+type = "plugin_action"
+command = "herdr-tsk.open-board"
+description = "tsk board (split beside current pane)"
+
+[[keys.command]]
+key = "prefix+a"
+type = "plugin_action"
+command = "herdr-tsk.quick-capture"
+description = "tsk quick capture (new task popup)"
+
 [ui.sound]
 enabled = false
 
