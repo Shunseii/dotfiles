@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import herdr_client
+from prs_view import PrView
 
 os.environ.setdefault("ESCDELAY", "25")
 
@@ -19,15 +20,36 @@ REFRESH_MS = 1000
 KIND_FILTERS = ["all", "agents", "shells"]
 STATUS_KEYS = {"b": "blocked", "w": "working", "i": "idle", "d": "done"}
 
+PAIR_TEAL = 9
+
+# Mirrors herdr's sidebar (src/client/shell.rs status_icon/status_color):
+# icons follow ui.status_indicators; colors are the theme's yellow, red, teal,
+# green, and overlay0 (plain text here). Shells have no sidebar icon in herdr.
+HERDR_ICONS = {
+    "dots": {"blocked": "●", "working": "●", "done": "●", "idle": "○", "unknown": "·"},
+    "symbols": {"blocked": "×", "working": "◐", "done": "✓", "idle": "○", "unknown": "·"},
+}
+STATUS_COLORS = {"blocked": 2, "working": 1, "done": PAIR_TEAL, "idle": 3, "unknown": 0}
+
+
+def herdr_indicator_style():
+    try:
+        import tomllib
+
+        config_path = Path(os.environ.get("HERDR_CONFIG_PATH") or Path.home() / ".config/herdr/config.toml")
+        with open(config_path, "rb") as handle:
+            style = tomllib.load(handle).get("ui", {}).get("status_indicators", "dots")
+    except (OSError, ValueError):
+        style = "dots"
+    return style if style in HERDR_ICONS else "dots"
+
+
 # status -> (glyph, label, color pair id)
 STATUS_STYLE = {
-    "blocked": ("▲", "blocked", 2),
-    "working": ("●", "working", 1),
-    "done": ("✓", "done", 3),
-    "idle": ("○", "idle", 4),
-    "unknown": ("?", "unknown", 5),
-    "shell": ("$", "shell", 0),
+    status: (HERDR_ICONS[herdr_indicator_style()][status], status, color)
+    for status, color in STATUS_COLORS.items()
 }
+STATUS_STYLE["shell"] = ("$", "shell", 0)
 STATUS_ORDER = ["blocked", "working", "done", "idle", "unknown"]
 
 PAIR_ACCENT = 6
@@ -50,6 +72,9 @@ class Row:
     path: str
     title: str
     focused: bool
+    # Position in herdr's snapshot: workspace sidebar order, then tab and pane
+    # order, the same order the left Agents panel lists agents in.
+    order: int = 0
     last_used: float = 0.0
     haystack: str = field(default="", repr=False)
 
@@ -78,7 +103,7 @@ def build_rows(snap, history):
     tab_times = history.get("tabs", {})
     focused_pane = snap.get("focused_pane_id")
     rows = []
-    for pane in snap.get("panes", []):
+    for order, pane in enumerate(snap.get("panes", [])):
         workspace = workspaces.get(pane.get("workspace_id"), {})
         tab = tabs.get(pane.get("tab_id"), {})
         agent = pane.get("agent")
@@ -97,6 +122,7 @@ def build_rows(snap, history):
             path=short_path(pane.get("foreground_cwd") or pane.get("cwd") or ""),
             title=pane.get("terminal_title_stripped") or "",
             focused=pane["pane_id"] == focused_pane,
+            order=order,
         )
         if row.focused:
             row.last_used = float("inf")
@@ -132,15 +158,39 @@ class Picker:
         self.cursor = 0
         self.scroll = 0
         self.first_load = True
+        # Like /prs, every open starts on panes and this session's PRs.
+        self.view = "panes"
+        self.prs = PrView(self, "mine")
 
     def save_prefs(self):
-        herdr_client.save_prefs({"grouped": self.grouped, "kind_filter": self.kind_filter})
+        herdr_client.save_prefs({**herdr_client.load_prefs(), "grouped": self.grouped, "kind_filter": self.kind_filter})
 
     def reload(self):
         selected = self.selected_row()
         selected_id = selected.pane_id if selected else None
-        self.rows = build_rows(herdr_client.snapshot(), herdr_client.load_history())
+        snap = herdr_client.snapshot()
+        self.rows = build_rows(snap, herdr_client.load_history())
         self.rebuild(keep_pane=selected_id)
+        if self.view == "prs":
+            self.prs.reload(snap)
+
+    def active_rebuild(self):
+        if self.view == "prs":
+            self.prs.rebuild()
+        else:
+            self.rebuild()
+
+    def active_move(self, delta):
+        if self.view == "prs":
+            self.prs.move(delta)
+        else:
+            self.move(delta)
+
+    def switch_view(self):
+        self.view = "prs" if self.view == "panes" else "panes"
+        self.query = ""
+        self.searching = False
+        self.reload()
 
     def visible_rows(self):
         words = self.query.lower().split()
@@ -162,10 +212,9 @@ class Picker:
         items = []
         if self.grouped:
             by_workspace = {}
-            for row in rows:
+            for row in sorted(rows, key=lambda r: r.order):
                 by_workspace.setdefault(row.workspace_id, []).append(row)
-            ordered = sorted(by_workspace.values(), key=lambda group: group[0].workspace_number)
-            for group in ordered:
+            for group in sorted(by_workspace.values(), key=lambda group: group[0].order):
                 items.append(ListItem(header=group[0].workspace_label))
                 items.extend(ListItem(row=row) for row in group)
         else:
@@ -243,6 +292,19 @@ class Picker:
         list_top = 3
         list_height = max(1, detail_y - 1 - list_top)
 
+        if self.view == "prs":
+            hidden_below = self.prs.draw_list(list_top, list_height, width)
+            self.put(detail_y - 1, 0, "─" * width, curses.A_DIM)
+            if self.message:
+                self.put(detail_y, 1, self.message.strip(), curses.color_pair(PAIR_MESSAGE) | curses.A_BOLD)
+            else:
+                self.prs.draw_detail(detail_y, width)
+            if hidden_below > 0:
+                self.put(detail_y - 1, width - 14, f" ↓ {hidden_below} more ", curses.A_DIM)
+            self.draw_footer(footer_top, footer_lines)
+            self.screen.refresh()
+            return
+
         layout = self.column_layout(width)
         self.draw_column_titles(2, layout)
 
@@ -257,7 +319,11 @@ class Picker:
             item = self.items[index]
             y = list_top + line
             if item.header is not None:
-                count = sum(1 for it in self.items if it.row and it.row.workspace_label == item.header)
+                count = 0
+                for following in self.items[index + 1:]:
+                    if following.header is not None:
+                        break
+                    count += 1
                 self.put(y, 1, f"▾ {item.header}", curses.color_pair(PAIR_ACCENT) | curses.A_BOLD)
                 self.put(y, 4 + len(item.header), f"{count}", curses.A_DIM)
                 continue
@@ -270,6 +336,10 @@ class Picker:
         hidden_below = len(self.items) - (self.scroll + list_height)
         if hidden_below > 0:
             self.put(detail_y - 1, width - 14, f" ↓ {hidden_below} more ", curses.A_DIM)
+        self.draw_footer(footer_top, footer_lines)
+        self.screen.refresh()
+
+    def draw_footer(self, footer_top, footer_lines):
         for offset, line in enumerate(footer_lines):
             x = 1
             for key, label in line:
@@ -277,12 +347,17 @@ class Picker:
                 x += len(key) + 2
                 self.put(footer_top + offset, x + 1, label, curses.A_DIM)
                 x += len(label) + 3
-        self.screen.refresh()
 
     def draw_header(self, y, width):
         x = 1
         self.put(y, x, "Goto", curses.A_BOLD)
         x += 6
+        x = self.draw_segments(y, x, [("panes", "Panes"), ("prs", "PRs")], self.view)
+        self.put(y, x + 1, "│", curses.A_DIM)
+        x += 4
+        if self.view == "prs":
+            self.prs.draw_header_extras(y, x, width)
+            return
         x = self.draw_segments(y, x, [("all", "All"), ("agents", "Agents"), ("shells", "Shells")], self.kind_filter)
         x += 2
         x = self.draw_segments(y, x, [(False, "Recent"), (True, "Grouped")], self.grouped)
@@ -322,7 +397,8 @@ class Picker:
             caret = "█" if self.searching else ""
             self.put(y, 1, "⌕", curses.color_pair(PAIR_ACCENT) | curses.A_BOLD)
             self.put(y, 3, f"{self.query}{caret}", curses.A_BOLD)
-            visible = sum(1 for item in self.items if item.row)
+            items = self.prs.items if self.view == "prs" else self.items
+            visible = sum(1 for item in items if getattr(item, "row", None) or getattr(item, "pr", None))
             self.put(y, width - 14, f"{visible:>4} match{'es' if visible != 1 else ''}", curses.A_DIM)
         else:
             self.put(y, 1, "⌕", curses.A_DIM)
@@ -403,8 +479,12 @@ class Picker:
         self.put(y, width - len(row.pane_id) - 2, row.pane_id, curses.A_DIM)
 
     def footer_layout(self, width):
-        if self.searching:
+        if self.searching and self.view == "prs":
+            hints = [("enter", "go to session"), ("↑↓", "move"), ("^u", "clear"), ("esc", "cancel")]
+        elif self.searching:
             hints = [("enter", "open"), ("↑↓", "move"), ("tab", "agents/shells"), ("^u", "clear"), ("esc", "cancel")]
+        elif self.view == "prs":
+            hints = self.prs.footer_hints()
         else:
             hints = [
                 ("o", "open"),
@@ -416,6 +496,7 @@ class Picker:
                 ("R", "auto-rename"),
                 ("b w i d", "blocked/working/idle/done"),
                 ("a", "all"),
+                ("p", "PRs"),
             ]
             if self.grouped:
                 hints.append(("h l", "prev/next workspace"))
@@ -504,6 +585,8 @@ class Picker:
             self.searching = False
             self.query = ""
         elif key in ("\n", "\r", curses.KEY_ENTER):
+            if self.view == "prs":
+                return "quit" if self.prs.go_to_session() else None
             return "open"
         elif key in (curses.KEY_BACKSPACE, "\x7f", "\b"):
             if self.query:
@@ -513,16 +596,16 @@ class Picker:
         elif key == "\x15":
             self.query = ""
         elif key in (curses.KEY_DOWN, "\x0e"):
-            self.move(1)
+            self.active_move(1)
             return None
         elif key in (curses.KEY_UP, "\x10"):
-            self.move(-1)
+            self.active_move(-1)
             return None
-        elif key == "\t":
+        elif key == "\t" and self.view == "panes":
             self.cycle_kind()
         elif isinstance(key, str) and key.isprintable():
             self.query += key
-        self.rebuild()
+        self.active_rebuild()
         return None
 
     def cycle_kind(self):
@@ -535,6 +618,16 @@ class Picker:
             return self.handle_search_key(key)
         if key in ("\x1b", "q"):
             return "quit"
+        if key == "p":
+            self.switch_view()
+            return None
+        if key == "/":
+            self.searching = True
+            return None
+        if self.view == "prs":
+            if self.prs.handle_key(key) == "jumped":
+                return "quit"
+            return None
         if key in ("\n", "\r", curses.KEY_ENTER, "o"):
             return "open"
         if key in ("j", curses.KEY_DOWN, "\x0e"):
@@ -645,6 +738,7 @@ def main(screen):
         4: curses.COLOR_CYAN,
         5: curses.COLOR_MAGENTA,
         PAIR_ACCENT: curses.COLOR_CYAN,
+        PAIR_TEAL: 14 if curses.COLORS >= 16 else curses.COLOR_CYAN,
     }
     for pair, foreground in foregrounds.items():
         if pair:
