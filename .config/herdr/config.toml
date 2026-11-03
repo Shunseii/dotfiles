@@ -22,6 +22,9 @@ pane_borders = true
 
 agent_panel_sort = "spaces"
 
+# herdr-auto-title names new tabs, so skip the name prompt.
+prompt_new_tab_name = false
+
 [keys]
 # tmux muscle memory: prefix was C-space, not the herdr default ctrl+b.
 prefix = "ctrl+space"
@@ -101,16 +104,6 @@ key = "prefix+g"
 type = "plugin_action"
 command = "shunsei.goto.open"
 description = "goto picker (recent first)"
-
-# Sync the focused pane's agent session name to its tab label. Detects Claude
-# Code or pi from the pane's foreground process and reads the live name (honors
-# `claude -n` / `/rename` and `pi -n` / `/name`). No-op if the focused pane
-# isn't a named session of either agent.
-[[keys.command]]
-key = "prefix+t"
-type = "shell"
-command = "/home/shunsei-pop/.config/herdr/sync-tab-title.sh"
-description = "sync agent session name to tab"
 
 [ui.sound]
 enabled = false

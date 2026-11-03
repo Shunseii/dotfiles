@@ -3,7 +3,6 @@
 import curses
 import os
 import subprocess
-import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -561,8 +560,8 @@ class Picker:
             self.message = ""
             return
         if row.agent == "claude":
-            launch_rename_worker(row.pane_id, name)
-            self.message = f"/rename “{name}” sent — tab syncs once Claude applies it"
+            send_rename(row.pane_id, name)
+            self.message = f"/rename “{name}” sent — tab follows once Claude applies it"
         else:
             subprocess.run([HERDR, "tab", "rename", row.tab_id, name], capture_output=True)
             self.message = f"renamed tab to “{name}”"
@@ -575,8 +574,8 @@ class Picker:
         if row.agent != "claude":
             self.message = "auto-rename needs a Claude pane — use r to rename this one"
             return
-        launch_rename_worker(row.pane_id)
-        self.message = "/rename sent — Claude is picking a name; tab syncs when it's set"
+        send_rename(row.pane_id)
+        self.message = "/rename sent — Claude is picking a name; tab follows when it's set"
 
     # ---- loop ----------------------------------------------------------
 
@@ -712,18 +711,11 @@ def fit_left(text, width):
     return "…" + text[-(width - 1):]
 
 
-def launch_rename_worker(pane_id, name=None):
-    """Detached so a busy Claude can apply /rename after the picker closes."""
-    worker = Path(__file__).with_name("rename_worker.py")
-    args = [sys.executable, str(worker), pane_id] + ([name] if name else [])
-    subprocess.Popen(
-        args,
-        cwd=worker.parent,
-        start_new_session=True,
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+def send_rename(pane_id, name=None):
+    """Type /rename into the Claude pane; herdr-auto-title syncs the tab once Claude applies it."""
+    command = f"/rename {name}" if name else "/rename"
+    subprocess.run([HERDR, "pane", "send-text", pane_id, command], capture_output=True)
+    subprocess.run([HERDR, "pane", "send-keys", pane_id, "Enter"], capture_output=True)
 
 
 def main(screen):
