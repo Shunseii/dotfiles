@@ -344,3 +344,7 @@ export PATH="/home/shunsei-pop/.local/share/pi-node/node-v22.22.3-linux-x64/bin:
 export EDITOR=nvim
 . "/home/shunsei-pop/.deno/env"
 
+
+# Android SDK (Expo / React Native local builds)
+export ANDROID_HOME="$HOME/Android/Sdk"
+export PATH="$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin"
