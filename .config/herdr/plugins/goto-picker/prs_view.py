@@ -3,8 +3,9 @@
 session-prs keeps each Claude session's pull requests in its mod store, a JSON
 file under ~/.claude/plugins/store keyed `session:<session id>`. This view reads
 that file, mirrors the mod's own pane (this session by default, `a` widens to
-every session, `o` opens, `y` yanks, `r` re-reads state from gh), and adds one
-thing the mod cannot: Enter jumps to the herdr pane running the PR's session.
+every agent open in herdr, `o` opens, `y` yanks, `r` re-reads state from gh), and
+adds one thing the mod cannot: Enter jumps to the herdr pane running the PR's
+session. Sessions with no live herdr pane are left out.
 
 The store belongs to the mod, so refreshed states stay in memory here, exactly
 like the mod's own wider view treats other sessions' rows.
@@ -57,7 +58,7 @@ class SessionPrs:
     name: str
     saved_at: float
     prs: list
-    pane_id: str | None
+    pane_id: str
 
 
 @dataclass
@@ -81,7 +82,7 @@ def live_session_names():
 
 
 def load_sessions(snapshot):
-    """Every session-prs store file merged, newest save first, empty sessions dropped."""
+    """Every session-prs store file merged, keeping only sessions live in a herdr pane."""
     panes_by_session = {}
     for pane in snapshot.get("panes", []):
         session_id = (pane.get("agent_session") or {}).get("value")
@@ -116,16 +117,16 @@ def load_sessions(snapshot):
             for pr in value.get("prs", [])
             if pr.get("repo") and pr.get("number")
         ]
-        if not prs:
-            continue
         session_id = key[len(STORE_PREFIX):]
+        if not prs or session_id not in panes_by_session:
+            continue
         sessions.append(
             SessionPrs(
                 session_id=session_id,
                 name=names.get(session_id) or value.get("name") or session_id[:8],
                 saved_at=value.get("savedAt", 0),
                 prs=prs,
-                pane_id=panes_by_session.get(session_id),
+                pane_id=panes_by_session[session_id],
             )
         )
     return stable_order(sessions)
@@ -355,9 +356,6 @@ class PrView:
         item = self.selected()
         if not item:
             return False
-        if not item.session.pane_id:
-            self.ui.message = f"“{item.session.name}” isn't running in a herdr pane — o opens the PR instead"
-            return False
         herdr_client.request("pane.focus", {"pane_id": item.session.pane_id})
         return True
 
@@ -410,7 +408,7 @@ class PrView:
         ]
 
     def draw_header_extras(self, y, x, width):
-        x = self.ui.draw_segments(y, x, [("mine", "This session"), ("all", "Every session")], self.scope)
+        x = self.ui.draw_segments(y, x, [("mine", "This session"), ("all", "Every agent")], self.scope)
         if self.refreshing:
             self.ui.put(y, x + 2, "⟳ gh", curses.A_DIM)
         counts = {}
@@ -452,16 +450,14 @@ class PrView:
             if item.header is not None:
                 attr = curses.color_pair(6) | curses.A_BOLD
                 self.ui.put(y, 1, f"▾ {item.header}", attr)
-                if item.session.pane_id:
-                    self.ui.put(y, 5 + len(item.header), "● live", curses.color_pair(3) | curses.A_DIM)
                 continue
             self.draw_row(y, width, item, index == self.cursor, title_x, title_width, repo_width, session_width)
 
         if not self.items:
             if self.scope == "mine":
-                hint = "no PRs for the Claude session in this pane — a shows every session's"
+                hint = "no PRs for the Claude session in this pane — a shows every open agent's"
             else:
-                hint = "no PRs recorded by session-prs yet"
+                hint = "no PRs from agents open in herdr"
             if self.ui.query:
                 hint = "nothing matches — esc clears search"
             self.ui.put(top + 1, 4, hint, curses.A_DIM)
@@ -484,17 +480,15 @@ class PrView:
         self.ui.put(y, title_x, fit(item.pr.title, title_width), style(0, curses.A_BOLD if selected else 0))
         repo = item.pr.repo.split("/")[-1]
         self.ui.put(y, title_x + title_width + 2, fit(repo, repo_width), style(6))
-        session = ("● " if item.session.pane_id else "  ") + item.session.name
-        self.ui.put(y, width - session_width - 1, fit(session, session_width), style(0, curses.A_DIM))
+        self.ui.put(y, width - session_width - 1, fit(item.session.name, session_width), style(0, curses.A_DIM))
 
     def draw_detail(self, y, width):
         item = self.selected()
         if not item:
             return
-        where = "live in herdr" if item.session.pane_id else "not open in herdr"
         self.ui.put(y, 1, item.pr.url, curses.A_DIM)
-        self.ui.put(y, max(len(item.pr.url) + 3, width - len(item.session.name) - len(where) - 6),
-                    f"{item.session.name} · {where}", curses.color_pair(6))
+        self.ui.put(y, max(len(item.pr.url) + 3, width - len(item.session.name) - 2),
+                    item.session.name, curses.color_pair(6))
 
 
 def fit(text, width):
