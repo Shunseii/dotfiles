@@ -1,6 +1,9 @@
+-- Use the local checkout when there is one (it's where dalil.nvim is developed), else install from GitHub.
+local checkout = vim.fn.expand("~/Projects/dalil.nvim")
+local source = vim.uv.fs_stat(checkout) and { dir = checkout } or { "Shunseii/dalil.nvim" }
+
 return {
-  {
-    dir = "~/Projects/dalil.nvim",
+  vim.tbl_extend("force", source, {
     name = "dalil.nvim",
     -- Loaded at startup rather than on first use, so restoring a session can bring back its chat.
     event = "VeryLazy",
@@ -20,5 +23,5 @@ return {
       { "<leader>aM", "<cmd>DalilModel<cr>", desc = "Claude model" },
       { "<leader>ax", "<cmd>DalilCancel<cr>", desc = "Cancel Claude" },
     },
-  },
+  }),
 }
