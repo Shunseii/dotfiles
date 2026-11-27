@@ -7,7 +7,7 @@ return {
     name = "dalil.nvim",
     -- Loaded at startup rather than on first use, so restoring a session can bring back its chat.
     event = "VeryLazy",
-    cmd = { "Dalil", "DalilOpen", "DalilNew", "DalilAsk", "DalilAdd", "DalilAddFile", "DalilMode", "DalilModel", "DalilCancel", "DalilSave", "DalilHistory", "DalilRename", "DalilDelete" },
+    cmd = { "Dalil", "DalilOpen", "DalilNew", "DalilAsk", "DalilAdd", "DalilAddFile", "DalilMode", "DalilModel", "DalilCancel", "DalilSave", "DalilHistory", "DalilRename", "DalilDelete", "DalilHint", "DalilHintDelete", "DalilHintClear", "DalilHintToggle" },
     opts = {},
     keys = {
       { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
@@ -22,6 +22,11 @@ return {
       { "<leader>am", "<cmd>DalilMode<cr>", desc = "Claude permission mode" },
       { "<leader>aM", "<cmd>DalilModel<cr>", desc = "Claude model" },
       { "<leader>ax", "<cmd>DalilCancel<cr>", desc = "Cancel Claude" },
+      { "<leader>ae", ":DalilHint<cr>", mode = { "n", "v" }, desc = "Hint for line/selection" },
+      { "<leader>aE", ":DalilHint!<cr>", mode = { "n", "v" }, desc = "Deeper hint (Opus)" },
+      { "<leader>ad", ":DalilHintDelete<cr>", mode = { "n", "v" }, desc = "Delete hint" },
+      { "<leader>aD", "<cmd>DalilHintClear<cr>", desc = "Delete all hints in buffer" },
+      { "<leader>at", "<cmd>DalilHintToggle<cr>", desc = "Toggle hints" },
     },
   }),
 }
